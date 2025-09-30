@@ -1,11 +1,15 @@
-from db import get_connection
+from db import get_engine
+from sqlalchemy import text
 
-# Example test — replace 'your_db_name' with an actual database name in your MySQL
-connection = get_connection("zing")
+db_name = "zing"
 
-if connection:
-    cursor = connection.cursor()
-    cursor.execute("SHOW TABLES;")
-    for table in cursor.fetchall():
-        print(table)
-    connection.close()
+try:
+    engine = get_engine(db_name)
+    with engine.connect() as conn:
+        result = conn.execute(text("SHOW TABLES;"))
+        tables = result.fetchall()
+        print(f"Connected to '{db_name}'. Tables:")
+        for table in tables:
+            print(table[0])
+except Exception as e:
+    print(f"Failed to connect to {db_name}: {e}")
